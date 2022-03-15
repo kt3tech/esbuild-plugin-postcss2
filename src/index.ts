@@ -30,7 +30,6 @@ interface PostCSSPluginOptions {
   sassOptions?: SassOptions;
   lessOptions?: Less.Options;
   stylusOptions?: StylusRenderOptions;
-  writeToFile?: boolean;
   fileIsModule?: (filename: string) => boolean;
 }
 
@@ -48,18 +47,16 @@ export const defaultOptions: PostCSSPluginOptions = {
   sassOptions: {},
   lessOptions: {},
   stylusOptions: {},
-  writeToFile: true,
   fileIsModule: null
 };
 
 const postCSSPlugin = ({
-  plugins,
-  modules,
-  rootDir,
-  sassOptions,
-  lessOptions,
-  stylusOptions,
-  writeToFile,
+  plugins = [],
+  modules = true,
+  rootDir = process.cwd(),
+  sassOptions = {},
+  lessOptions = {},
+  stylusOptions = {},
   fileIsModule
 }: PostCSSPluginOptions = defaultOptions): Plugin => ({
   name: "postcss2",
@@ -144,7 +141,10 @@ const postCSSPlugin = ({
 
         // parse files with preprocessors
         if (sourceExt === ".sass" || sourceExt === ".scss") {
-          const sassResult = await renderSass({...sassOptions, file: sourceFullPath})
+          const sassResult = await renderSass({
+            ...sassOptions,
+            file: sourceFullPath
+          });
           css = sassResult.css.toString();
           watchFiles.push(...sassResult.stats.includedFiles);
         }
@@ -172,21 +172,14 @@ const postCSSPlugin = ({
         watchFiles.push(...getPostCssDependencies(result.messages));
 
         // Write result CSS
-        if (writeToFile) {
-          await writeFile(tmpFilePath, result.css);
-        }
+        await writeFile(tmpFilePath, result.css);
 
         return {
-          namespace: isModule
-            ? "postcss-module"
-            : writeToFile
-            ? "file"
-            : "postcss-text",
+          namespace: isModule ? "postcss-module" : "file",
           path: tmpFilePath,
           watchFiles,
           pluginData: {
-            originalPath: sourceFullPath,
-            css: result.css
+            originalPath: sourceFullPath
           }
         };
       }
@@ -199,30 +192,16 @@ const postCSSPlugin = ({
         const mod = modulesMap.find(
             ({ path }) => path === args?.pluginData?.originalPath
           ),
-          resolveDir = path.dirname(args.path),
-          css = args?.pluginData?.css || "";
+          resolveDir = path.dirname(args.path);
 
         return {
           resolveDir,
-          contents: [
-            writeToFile ? `import ${JSON.stringify(args.path)};` : null,
-            `export default ${JSON.stringify(mod && mod.map ? mod.map : {})};`,
-            writeToFile
-              ? null
-              : `export const stylesheet=${JSON.stringify(css)};`
-          ]
-            .filter(Boolean)
-            .join("\n")
+          contents: `import ${JSON.stringify(
+            args.path
+          )};\nexport default ${JSON.stringify(mod && mod.map ? mod.map : {})};`
         };
       }
     );
-
-    build.onLoad({ filter: /.*/, namespace: "postcss-text" }, async (args) => {
-      const css = args?.pluginData?.css || "";
-      return {
-        contents: `export default ${JSON.stringify(css)};`
-      };
-    });
   }
 });
 

@@ -1,4 +1,5 @@
 # Looking for a maintainer!
+
 Unfortunately I don't have time for this plugin. Please contact me if you'd like to take on this project.
 
 # esbuild-plugin-postcss2
