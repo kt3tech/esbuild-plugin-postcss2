@@ -1,10 +1,10 @@
 {
-  "name": "@frappe/esbuild-plugin-postcss2",
+  "name": "@/k3_kt_com/esbuild-plugin-postcss2",
   "version": "0.1.3",
   "description": "Use postcss with esbuild",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/frappe/esbuild-plugin-postcss2.git"
+    "url": "git+https://github.com//k3_kt_com/esbuild-plugin-postcss2.git"
   },
   "author": "Marton Lederer <marton@lederer.hu>",
   "license": "MIT",
@@ -65,7 +65,7 @@
     "stylus": "^0.x"
   },
   "bugs": {
-    "url": "https://github.com/frappe/esbuild-plugin-postcss2/issues"
+    "url": "https://github.com/k3tech/esbuild-plugin-postcss2/issues"
   },
-  "homepage": "https://github.com/frappe/esbuild-plugin-postcss2#readme"
+  "homepage": "https://github.com/k3tech/esbuild-plugin-postcss2#readme"
 }
